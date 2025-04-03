@@ -1,0 +1,13 @@
+FROM jenkins/jenkins:lts
+
+# Instalar plugins necessários
+RUN jenkins-plugin-cli --plugins git pipeline-stage-view blueocean
+
+# Criar diretório para configuração automática
+COPY casc.yaml /var/jenkins_home/casc.yaml
+
+# Configurar o Jenkins para usar o Configuration as Code
+ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
+
+# Criar usuário admin automaticamente
+COPY security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy

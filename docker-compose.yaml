@@ -1,6 +1,20 @@
-version: '3.8'
+
 
 services:
+  jenkins:
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile-Jenkins
+    container_name: jenkins_container
+    restart: always
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Permitir que o Jenkins controle Docker
+      - jenkins_home:/var/jenkins_home
+      - .:/var/jenkins_home/workspace/mlops_v1  # Montar o código do projeto
+      
   model:
     build:
       context: ./model
@@ -23,3 +37,6 @@ services:
       - model
     container_name: webapp_container
     restart: always
+
+volumes:
+  jenkins_home:

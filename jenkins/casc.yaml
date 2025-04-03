@@ -1,0 +1,16 @@
+jenkins:
+  jobs:
+    - script: |
+        pipelineJob('mlops-pipeline') {
+            definition {
+                cpsScm {
+                    scm {
+                        git {
+                            remote('https://github.com/rianbl/mlops_v1.git')  # Repositório correto
+                            branch('main')  # Certifique-se de que a branch está correta
+                        }
+                    }
+                    scriptPath('jenkins/Jenkinsfile')  # Caminho correto dentro do repositório
+                }
+            }
+        }

@@ -1,0 +1,13 @@
+2025-04-03 20:05:36,432 - INFO - Carregando o dataset Iris.
+2025-04-03 20:05:36,434 - INFO - Dividindo o dataset em treino e teste.
+2025-04-03 20:05:36,437 - INFO - Treinando o modelo RandomForest.
+2025-04-03 20:05:36,556 - INFO - Testando o modelo.
+2025-04-03 20:05:36,566 - INFO - Acurácia do modelo: 1.0000
+2025-04-03 20:05:36,567 - INFO - Salvando o modelo em /app/models/RandomForest_20250403_200536.pkl.
+2025-04-03 20:05:36,583 - INFO - numpy       : 2.0.2
+scipy       : 1.13.1
+pandas      : not installed
+scikit-learn: 1.6.1
+
+2025-04-03 20:05:36,584 - INFO - Versões dos pacotes registradas.
+2025-04-03 20:05:36,584 - INFO - Processo finalizado com sucesso.
