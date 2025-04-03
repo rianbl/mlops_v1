@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previsão de Espécie - Iris</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Previsão de Espécie - Iris</h1>
+    <form id="prediction-form">
+        <label for="sepal_length">Comprimento da Sépala:</label>
+        <input type="number" id="sepal_length" step="0.1" required>
+
+        <label for="sepal_width">Largura da Sépala:</label>
+        <input type="number" id="sepal_width" step="0.1" required>
+
+        <label for="petal_length">Comprimento da Pétala:</label>
+        <input type="number" id="petal_length" step="0.1" required>
+
+        <label for="petal_width">Largura da Pétala:</label>
+        <input type="number" id="petal_width" step="0.1" required>
+
+        <button type="submit">Prever</button>
+    </form>
+    <p id="result"></p>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
