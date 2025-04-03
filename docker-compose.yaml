@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  iris-model:
+    build:
+      context: ./model
+      dockerfile: Dockerfile-model
+    volumes:
+      - ./models:/app/models 
+      - ./logs:/app/logs  # Monta a pasta local para armazenar o modelo
+    container_name: iris_model_container
+    restart: "no"
