@@ -8,9 +8,8 @@ USER root
 RUN apt-get update && \
     apt-get install -y docker.io docker-compose && \
     usermod -aG docker jenkins && \
+    chown jenkins:docker /var/run/docker.sock && \
     rm -rf /var/lib/apt/lists/*
-
-# Voltar para o usuário Jenkins
 USER jenkins
 
 # Copiar arquivos de configuração

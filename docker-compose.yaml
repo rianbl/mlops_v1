@@ -3,18 +3,15 @@
 services:
   jenkins:
     build:
-      context: ./jenkins
+      context: .
       dockerfile: Dockerfile-Jenkins
-    container_name: jenkins_container
-    restart: always
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # Permitir que o Jenkins controle Docker
       - jenkins_home:/var/jenkins_home
-      # Removido: - .:/var/jenkins_home/workspace/mlops_v1  # Montagem removida para evitar problemas de permissão
-
+      - /var/run/docker.sock:/var/run/docker.sock  # <-- Adiciona isso
+      
   model:
     build:
       context: ./model
