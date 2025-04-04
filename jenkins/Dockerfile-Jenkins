@@ -5,11 +5,13 @@ RUN jenkins-plugin-cli --plugins git pipeline-stage-view blueocean
 
 # Instalar Docker e Docker Compose
 USER root
-RUN apt-get update && \
-    apt-get install -y docker.io docker-compose && \
-    usermod -aG docker jenkins && \
-    chown jenkins:docker /var/run/docker.sock && \
-    rm -rf /var/lib/apt/lists/*
+# ===> Align Docker group with host (replace 999 with your host GID)
+RUN groupadd -g 989 docker \
+    && usermod -aG docker jenkins \
+    && apt-get update \
+    && apt-get install -y docker.io docker-compose \
+    && rm -rf /var/lib/apt/lists/*
+
 USER jenkins
 
 # Copiar arquivos de configuração
