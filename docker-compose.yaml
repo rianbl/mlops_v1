@@ -27,7 +27,8 @@ services:
       context: ./webapp
       dockerfile: Dockerfile-webapp
     volumes:
-      - ./model/models:/app/models  # A API acessa os modelos treinados
+      - ./model/models:/app/models 
+      - ./model/logs:/app/logs
     ports:
       - "5001:5001"
     depends_on:
