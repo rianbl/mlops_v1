@@ -3,11 +3,19 @@ FROM jenkins/jenkins:lts
 # Instalar plugins necessários
 RUN jenkins-plugin-cli --plugins git pipeline-stage-view blueocean
 
-# Criar diretório para configuração automática
+# Instalar Docker e Docker Compose
+USER root
+RUN apt-get update && \
+    apt-get install -y docker.io docker-compose && \
+    usermod -aG docker jenkins && \
+    rm -rf /var/lib/apt/lists/*
+
+# Voltar para o usuário Jenkins
+USER jenkins
+
+# Copiar arquivos de configuração
 COPY casc.yaml /var/jenkins_home/casc.yaml
+COPY security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy
 
 # Configurar o Jenkins para usar o Configuration as Code
 ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
-
-# Criar usuário admin automaticamente
-COPY security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy
