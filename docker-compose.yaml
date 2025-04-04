@@ -13,8 +13,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Permitir que o Jenkins controle Docker
       - jenkins_home:/var/jenkins_home
-      - .:/var/jenkins_home/workspace/mlops_v1  # Montar o código do projeto
-      
+      # Removido: - .:/var/jenkins_home/workspace/mlops_v1  # Montagem removida para evitar problemas de permissão
+
   model:
     build:
       context: ./model
