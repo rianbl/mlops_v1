@@ -7,6 +7,7 @@ pipeline {
           echo 'Construindo e rodando o container do modelo...'
           sh 'docker-compose up --build model'
         }
+
       }
     }
 
@@ -16,16 +17,7 @@ pipeline {
           echo 'Parando o container do modelo após execução...'
           sh 'docker stop model_container || true'
         }
-      }
-    }
 
-    stage('Verificar existência da pasta de logs') {
-      steps {
-        script {
-          echo 'Verificando se a pasta ./model/logs existe no host...'
-          sh 'sleep 5'
-          sh 'ls -l ./model/logs || echo "logs ainda nao existem"'
-        }
       }
     }
 
@@ -35,7 +27,9 @@ pipeline {
           echo 'Iniciando o WebApp...'
           sh 'docker-compose up -d --build webapp'
         }
+
       }
     }
+
   }
 }
