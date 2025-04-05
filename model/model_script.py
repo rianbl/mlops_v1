@@ -39,13 +39,6 @@ y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 logging.info(f"Acurácia do modelo: {accuracy:.4f}")
 
-# Salvar modelo
-model_filename = f"RandomForest_{timestamp}.pkl"
-model_path = f"/app/models/{model_filename}"
-logging.info(f"Salvando o modelo em {model_path}.")
-with open(model_path, "wb") as f:
-    pickle.dump(model, f)
-
 # Configuração do logger para registrar as versões dos pacotes
 package_log_path = "/app/logs/package_versions.log"
 logging.basicConfig(filename=package_log_path, level=logging.INFO, format="%(message)s")
@@ -55,5 +48,12 @@ version_info = watermark.watermark(packages="numpy,scipy,pandas,scikit-learn")
 logging.info(version_info)
 print("\n" + version_info)
 logging.info("Versões dos pacotes registradas.")
+
+# Salvar modelo
+model_filename = f"RandomForest_{timestamp}.pkl"
+model_path = f"/app/models/{model_filename}"
+logging.info(f"Salvando o modelo em {model_path}.")
+with open(model_path, "wb") as f:
+    pickle.dump(model, f)
 
 logging.info("Processo finalizado com sucesso.")
