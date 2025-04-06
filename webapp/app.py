@@ -1,19 +1,27 @@
 from flask import Flask, request, jsonify, render_template
-import pickle
+import mlflow
+import mlflow.pyfunc
 import numpy as np
-import os
 
 app = Flask(__name__)
 
-# Buscar o modelo salvo mais recente
-model_dir = "/app/models"
-model_files = sorted([f for f in os.listdir(model_dir) if f.endswith(".pkl")], reverse=True)
-if model_files:
-    model_path = os.path.join(model_dir, model_files[0])
-    with open(model_path, "rb") as f:
-        model = pickle.load(f)
-else:
-    model = None
+# Set the MLflow tracking URI (optional, if not set via environment)
+mlflow.set_tracking_uri("http://mlflow:5000")
+mlflow.set_registry_uri("http://mlflow:5000")
+
+def load_registered_model():
+    try:
+        # Load the model from the MLflow Model Registry.
+        # Make sure the model "RandomForestIrisModel" is promoted to the "Production" stage.
+        model_uri = "models:/RandomForestIrisModel/Production"
+        model = mlflow.pyfunc.load_model(model_uri)
+        return model
+    except Exception as e:
+        print(f"Error loading model from MLflow: {e}")
+        return None
+
+# Load the model from MLflow
+model = load_registered_model()
 
 @app.route("/")
 def home():
@@ -22,7 +30,7 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     if model is None:
-        return jsonify({"error": "Modelo não encontrado"}), 500
+        return jsonify({"error": "Model not found"}), 500
 
     try:
         data = request.json
