@@ -1,35 +1,41 @@
 pipeline {
   agent any
   stages {
-    stage('Build e Start Model') {
+
+    stage('Start MLflow') {
       steps {
         script {
-          echo 'Construindo e rodando o container do modelo...'
-          sh 'docker-compose up --build model'
+          echo 'Building and starting the MLflow container...'
+          sh 'docker-compose up -d --build mlflow'
         }
-
       }
     }
 
-    stage('Parar Model Container') {
+    stage('Build and Start Model') {
       steps {
         script {
-          echo 'Parando o container do modelo após execução...'
+          echo 'Building and running the model container...'
+          sh 'docker-compose up --build model'
+        }
+      }
+    }
+
+    stage('Stop Model Container') {
+      steps {
+        script {
+          echo 'Stopping the model container after execution...'
           sh 'docker stop model_container || true'
         }
-
       }
     }
 
     stage('Start WebApp') {
       steps {
         script {
-          echo 'Iniciando o WebApp...'
+          echo 'Starting the WebApp...'
           sh 'docker-compose up -d --build webapp'
         }
-
       }
     }
-
   }
 }
