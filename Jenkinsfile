@@ -1,39 +1,21 @@
 pipeline {
   agent any
   stages {
-
-    stage('Start MLflow') {
+    stage('Retraining Model') {
       steps {
         script {
-          echo 'Building and starting the MLflow container...'
-          sh 'docker-compose up -d --build mlflow'
+          echo 'Iniciando processo de retreinamento do modelo...'
+          // Executa o script de treinamento no container "model" e espera seu término.
+          sh 'docker-compose run --rm model python model_script.py'
         }
       }
     }
-
-    stage('Build and Start Model') {
+    stage('Restart WebApp') {
       steps {
         script {
-          echo 'Building and running the model container...'
-          sh 'docker-compose up --build model'
-        }
-      }
-    }
-
-    stage('Stop Model Container') {
-      steps {
-        script {
-          echo 'Stopping the model container after execution...'
-          sh 'docker stop model_container || true'
-        }
-      }
-    }
-
-    stage('Start WebApp') {
-      steps {
-        script {
-          echo 'Starting the WebApp...'
-          sh 'docker-compose up -d --build webapp'
+          echo 'Reiniciando o container do WebApp para carregar o novo modelo...'
+          // Reinicia o container do webapp para que ele carregue a nova versão do modelo.
+          sh 'docker-compose restart webapp'
         }
       }
     }

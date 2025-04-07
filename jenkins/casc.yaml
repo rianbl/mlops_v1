@@ -10,7 +10,7 @@ jenkins:
                             branch('main')  # Certifique-se de que a branch está correta
                         }
                     }
-                    scriptPath('/Jenkinsfile')  # Caminho correto dentro do repositório
+                    scriptPath('Jenkinsfile')  # Caminho correto dentro do repositório
                 }
             }
         }
