@@ -44,7 +44,7 @@ services:
       context: ./webapp
       dockerfile: Dockerfile-webapp
     volumes:
-      - mlflow_artifacts:/app/artifacts
+      - mlflow_artifacts:/mlflow/artifacts   # Mount at /mlflow/artifacts instead of /app/artifacts
       - ./model/models:/app/models
       - ./model/logs:/app/logs
     ports:
