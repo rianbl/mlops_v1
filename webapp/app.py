@@ -6,6 +6,7 @@ import time
 import traceback
 import logging
 import sys
+from mlflow.tracking import MlflowClient
 
 app = Flask(__name__)
 
@@ -21,28 +22,29 @@ logger = logging.getLogger(__name__)
 mlflow.set_tracking_uri("http://mlflow:5000")
 mlflow.set_registry_uri("http://mlflow:5000")
 
-def load_registered_model(retries=5, delay=5):
-    model_uri = "models:/RandomForestIrisModel/Production"
+def wait_for_model_availability(model_name="RandomForestIrisModel", stage="Production", timeout=300, poll_interval=10):
+    client = MlflowClient()
+    elapsed = 0
 
-    for attempt in range(1, retries + 1):
+    while elapsed < timeout:
         try:
-            logger.info(f"Tentativa {attempt} de {retries} para carregar o modelo...")
-            model = mlflow.pyfunc.load_model(model_uri)
-            logger.info("Modelo carregado com sucesso.")
-            return model
+            logger.info(f"Verificando disponibilidade do modelo '{model_name}' no estágio '{stage}'...")
+            versions = client.get_latest_versions(model_name, [stage])
+            if versions:
+                logger.info(f"Modelo encontrado com version: {versions[0].version}.")
+                return mlflow.pyfunc.load_model(f"models:/{model_name}/{stage}")
         except Exception as e:
-            logger.error(f"Falha ao carregar modelo na tentativa {attempt}: {e}")
-            logger.error(traceback.format_exc())
-            if attempt < retries:
-                wait = delay * attempt
-                logger.info(f"Aguardando {wait} segundos antes da próxima tentativa...")
-                time.sleep(wait)
-            else:
-                logger.critical("Todas as tentativas de carregar o modelo falharam.")
+            logger.warning(f"Erro ao verificar modelo: {e}")
+
+        logger.info(f"Aguardando {poll_interval}s antes da próxima verificação...")
+        time.sleep(poll_interval)
+        elapsed += poll_interval
+
+    logger.critical(f"Timeout ao aguardar o modelo '{model_name}' no estágio '{stage}'.")
     return None
 
-# Load the model from MLflow
-model = load_registered_model()
+# Uso no início
+model = wait_for_model_availability()
 
 @app.route("/")
 def home():
