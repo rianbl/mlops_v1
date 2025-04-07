@@ -23,7 +23,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Configurar Jenkins Configuration as Code
 ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
 
-# Definir o usuário padrão como jenkins
-USER jenkins
-
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
