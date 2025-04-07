@@ -3,13 +3,16 @@ FROM jenkins/jenkins:lts
 # Instalar plugins necessários
 RUN jenkins-plugin-cli --plugins git pipeline-stage-view blueocean
 
-# Instalar gosu
+# Instalar gosu e outras dependências
 USER root
 RUN apt-get update && apt-get install -y \
     gosu \
     docker.io \
     docker-compose \
  && rm -rf /var/lib/apt/lists/*
+
+# Adicionar o usuário jenkins ao grupo docker
+RUN usermod -aG docker jenkins
 
 # Copiar arquivos de configuração
 COPY casc.yaml /var/jenkins_home/casc.yaml
@@ -19,5 +22,8 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Configurar Jenkins Configuration as Code
 ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
+
+# Definir o usuário padrão como jenkins
+USER jenkins
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
