@@ -3,24 +3,20 @@ FROM jenkins/jenkins:lts
 # Instalar plugins necessários
 RUN jenkins-plugin-cli --plugins git pipeline-stage-view blueocean
 
-# Instalar gosu e outras dependências
+# Instalar Docker e Docker Compose
 USER root
-RUN apt-get update && apt-get install -y \
-    gosu \
-    docker.io \
-    docker-compose \
- && rm -rf /var/lib/apt/lists/*
+# ===> Align Docker group with host (replace 999 with your host GID)
+RUN groupadd -g 989 docker \
+    && usermod -aG docker jenkins \
+    && apt-get update \
+    && apt-get install -y docker.io docker-compose \
+    && rm -rf /var/lib/apt/lists/*
 
-# Adicionar o usuário jenkins ao grupo docker
-RUN usermod -aG docker jenkins
+USER jenkins
 
 # Copiar arquivos de configuração
 COPY casc.yaml /var/jenkins_home/casc.yaml
 COPY security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Configurar Jenkins Configuration as Code
+# Configurar o Jenkins para usar o Configuration as Code
 ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
