@@ -6,7 +6,7 @@ pipeline {
         script {
           echo 'Iniciando processo de retreinamento do modelo...'
           // Executa o script de treinamento no container "model" e espera seu término.
-          sh 'docker-compose run --rm model python model_script.py'
+          sh 'docker-compose run --rm --no-deps model python model_script.py'
         }
       }
     }
