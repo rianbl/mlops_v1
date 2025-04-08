@@ -22,7 +22,10 @@ logger = logging.getLogger(__name__)
 mlflow.set_tracking_uri("http://mlflow:5000")
 mlflow.set_registry_uri("http://mlflow:5000")
 
-def wait_for_model_availability(model_name="RandomForestIrisModel", stage="Production", timeout=300, poll_interval=10):
+# No topo do arquivo Flask
+model_info = {"name": None, "version": None}
+
+def wait_for_model_availability(model_name="RandomForest", stage="Production", timeout=300, poll_interval=10):
     from mlflow.tracking import MlflowClient
     client = MlflowClient()
     elapsed = 0
@@ -31,8 +34,19 @@ def wait_for_model_availability(model_name="RandomForestIrisModel", stage="Produ
             logger.info(f"Verificando disponibilidade do modelo '{model_name}' no estágio '{stage}'...")
             versions = client.get_latest_versions(model_name, [stage])
             if versions:
-                logger.info(f"Modelo encontrado com version: {versions[0].version}.")
-                return mlflow.pyfunc.load_model(f"models:/{model_name}/{stage}")
+                version = versions[0].version
+                model_uri = f"models:/{model_name}/{stage}"
+                loaded_model = mlflow.pyfunc.load_model(model_uri)
+                
+                # Atualiza as informações do modelo globalmente
+                global model_info
+                model_info = {
+                    "name": model_name,
+                    "version": version
+                }
+                
+                logger.info(f"Modelo encontrado: {model_info}")
+                return loaded_model
         except Exception as e:
             logger.warning(f"Erro ao verificar modelo: {e}")
         logger.info(f"Aguardando {poll_interval}s antes da próxima verificação...")
@@ -43,6 +57,11 @@ def wait_for_model_availability(model_name="RandomForestIrisModel", stage="Produ
 
 # Carregar o modelo ao iniciar
 model = wait_for_model_availability()
+
+# Endpoint para fornecer informações do modelo atual
+@app.route("/model-info")
+def get_model_info():
+    return jsonify(model_info)
 
 @app.route("/")
 def home():

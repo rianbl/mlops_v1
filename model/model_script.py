@@ -10,7 +10,7 @@ from mlflow.tracking import MlflowClient
 # Set MLflow tracking URI (optional if already provided via environment)
 mlflow.set_registry_uri("http://mlflow:5000")
 mlflow.set_tracking_uri("http://mlflow:5000")
-mlflow.set_experiment("IrisModelTraining")
+mlflow.set_experiment("Model_Experiment")
 
 with mlflow.start_run() as run:
     mlflow.log_param("n_estimators", 100)
@@ -37,17 +37,17 @@ with mlflow.start_run() as run:
     mlflow.log_param("package_versions", version_info)
     
     # Log the model and register it in MLflow Model Registry
-    mlflow.sklearn.log_model(model, "model", registered_model_name="RandomForestIrisModel")
+    mlflow.sklearn.log_model(model, "model", registered_model_name="RandomForest")
     
     print("MLflow run completed. Run ID:", run.info.run_id)
 
     # Promote the latest model version to Production
     client = MlflowClient(tracking_uri="http://mlflow:5000")
-    latest_versions = client.get_latest_versions("RandomForestIrisModel")
+    latest_versions = client.get_latest_versions("RandomForest")
     if latest_versions:
         version_to_promote = latest_versions[0].version
         client.transition_model_version_stage(
-            name="RandomForestIrisModel",
+            name="RandomForest",
             version=version_to_promote,
             stage="Production",
             archive_existing_versions=True

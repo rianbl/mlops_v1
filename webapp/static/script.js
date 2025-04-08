@@ -17,3 +17,13 @@ document.getElementById("prediction-form").addEventListener("submit", async func
     let result = await response.json();
     document.getElementById("result").textContent = result.error || `Previsão: ${result.prediction}`;
 });
+
+// Busca informações do modelo ao carregar a página
+async function fetchModelInfo() {
+    let response = await fetch("/model-info");
+    let info = await response.json();
+    document.getElementById("model-info").textContent = 
+        `Model: ${info.name} - Version: ${info.version}`;
+}
+
+window.onload = fetchModelInfo;
