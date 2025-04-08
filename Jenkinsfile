@@ -5,7 +5,6 @@ pipeline {
       steps {
         script {
           echo 'Iniciando processo de retreinamento do modelo...'
-          // Executa o script de treinamento no container "model" (sem subir dependências)
           sh 'docker-compose run --rm --no-deps model python model_script.py'
         }
       }
@@ -13,9 +12,15 @@ pipeline {
     stage('Restart WebApp') {
       steps {
         script {
-          echo 'Reiniciando (ou iniciando) o container do WebApp para carregar o novo modelo...'
-          // Garante que o serviço webapp esteja ativo, criando-o se necessário
-          sh 'docker-compose up -d webapp'
+          echo 'Reiniciando o container do WebApp para carregar o novo modelo...'
+          sh '''
+            if [ $(docker ps -aq -f name=webapp_container) ]; then
+              echo 'Removendo o container existente do WebApp...'
+              docker rm -f webapp_container
+            fi
+            echo 'Iniciando um novo container do WebApp...'
+            docker-compose up -d webapp
+          '''
         }
       }
     }
