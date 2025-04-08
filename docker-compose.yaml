@@ -55,9 +55,6 @@ services:
       - ./model/logs:/app/logs
     ports:
       - "5001:5001"
-    depends_on:
-      - model
-      - mlflow
     networks:
       - mlops_network
     container_name: webapp_container
