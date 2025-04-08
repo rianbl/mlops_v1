@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile-model
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
-      - MLFLOW_DEFAULT_ARTIFACT_ROOT=file:///mlflow/artifacts
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
     volumes:
       - mlflow_artifacts:/mlflow/artifacts
       - ./model/models:/app/models
