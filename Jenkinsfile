@@ -9,11 +9,14 @@ pipeline {
         }
       }
     }
-    stage('Restart WebApp') {
+    stage('Reload WebApp Model') {
       steps {
         script {
-          echo 'Reiniciando o container do WebApp para carregar o novo modelo...'
-          sh 'docker-compose up -d --force-recreate webapp'
+          echo 'Enviando chamada ao endpoint de reload do modelo no WebApp...'
+          // Aguarda alguns segundos para garantir que o modelo esteja registrado
+          sh 'sleep 10'
+          // Faz uma requisição POST para o endpoint /reload-model
+          sh 'curl -X POST http://localhost:5001/reload-model'
         }
       }
     }
