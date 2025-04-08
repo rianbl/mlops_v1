@@ -1,5 +1,32 @@
-version: '3.8'
 services:
+  minio:
+    image: minio/minio
+    container_name: minio_container
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: mlflow
+      MINIO_ROOT_PASSWORD: mlflow123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - mlops_network
+    restart: unless-stopped
+
+  minio-client:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "chmod +x /scripts/create-bucket.sh && /scripts/create-bucket.sh"
+    volumes:
+      - ./minio/create-bucket.sh:/scripts/create-bucket.sh
+    networks:
+      - mlops_network
+
   jenkins:
     build:
       context: ./jenkins
@@ -22,25 +49,22 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - mlflow_artifacts:/mlflow/artifacts
       - mlflow_db:/mlflow/db
     networks:
       - mlops_network
     container_name: mlflow_container
+    restart: unless-stopped
 
   model:
     build:
       context: ./model
       dockerfile: Dockerfile-model
-    environment:
-      - MLFLOW_TRACKING_URI=http://mlflow:5000
-      - MLFLOW_DEFAULT_ARTIFACT_ROOT=file:///mlflow/artifacts
-    volumes:
-      - mlflow_artifacts:/mlflow/artifacts
-      - ./model/models:/app/models
-      - ./model/logs:/app/logs
     depends_on:
       - mlflow
+    environment:
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=mlflow
+      - AWS_SECRET_ACCESS_KEY=mlflow123
     networks:
       - mlops_network
     container_name: model_container
@@ -50,12 +74,12 @@ services:
     build:
       context: ./webapp
       dockerfile: Dockerfile-webapp
-    volumes:
-      - mlflow_artifacts:/mlflow/artifacts
-      - ./model/models:/app/models
-      - ./model/logs:/app/logs
     ports:
       - "5001:5001"
+    environment:
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=mlflow
+      - AWS_SECRET_ACCESS_KEY=mlflow123
     networks:
       - mlops_network
     container_name: webapp_container
@@ -67,5 +91,5 @@ networks:
 
 volumes:
   jenkins_home:
-  mlflow_artifacts:
   mlflow_db:
+  minio_data:

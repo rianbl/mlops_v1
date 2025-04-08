@@ -3,3 +3,4 @@ mlflow==2.21.3
 watermark
 pandas
 numpy==2.0.2
+boto3
