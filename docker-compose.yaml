@@ -10,6 +10,8 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - mlops_network
     container_name: jenkins_container
 
   mlflow:
@@ -21,6 +23,8 @@ services:
     volumes:
       - mlflow_artifacts:/mlflow/artifacts
       - mlflow_db:/mlflow/db
+    networks:
+      - mlops_network
     container_name: mlflow_container
 
   model:
@@ -31,11 +35,13 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - MLFLOW_DEFAULT_ARTIFACT_ROOT=file:///mlflow/artifacts
     volumes:
-      - mlflow_artifacts:/mlflow/artifacts  # Volume compartilhado com o mlflow
+      - mlflow_artifacts:/mlflow/artifacts
       - ./model/models:/app/models
       - ./model/logs:/app/logs
     depends_on:
       - mlflow
+    networks:
+      - mlops_network
     container_name: model_container
     restart: "no"
 
@@ -44,7 +50,7 @@ services:
       context: ./webapp
       dockerfile: Dockerfile-webapp
     volumes:
-      - mlflow_artifacts:/mlflow/artifacts   # Mount at /mlflow/artifacts instead of /app/artifacts
+      - mlflow_artifacts:/mlflow/artifacts
       - ./model/models:/app/models
       - ./model/logs:/app/logs
     ports:
@@ -52,8 +58,14 @@ services:
     depends_on:
       - model
       - mlflow
+    networks:
+      - mlops_network
     container_name: webapp_container
     restart: always
+
+networks:
+  mlops_network:
+    name: mlops_network
 
 volumes:
   jenkins_home:
